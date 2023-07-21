@@ -4,6 +4,6 @@ import './assets/css/reset.css'
 import 'vant/lib/index.css'
 import './style.scss'
 import './assets/js/rem'
-import { Loading, Collapse, CollapseItem, Dialog } from 'vant'
+import { Loading, Collapse, CollapseItem, Dialog, Popover, Circle } from 'vant'
 
-createApp(App).use(Loading).use(Collapse).use(CollapseItem).use(Dialog).mount('#app')
+createApp(App).use(Loading).use(Collapse).use(CollapseItem).use(Dialog).use(Popover).use(Circle).mount('#app')

@@ -199,6 +199,7 @@ export const getSourceCode = async (contract) => {
           sourcesArr.push(item)
         }
         contract.sources = sourcesArr
+        if (sourcesArr && sourcesArr.length) contract.isOpenSources = true
         contract.isGetSources = true
         contract.abi = result.ABI ? JSON.parse(result.ABI) : ''
         contract.isUpdate = false

@@ -1,9 +1,11 @@
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0-modified | 20110126
    License: none (public domain)
+   
 */
+@import url('https://fonts.cdnfonts.com/css/euclid-circular-b');
 html, body {
-    font-family: PingFang SC, Avenir, Helvetica, Arial, sans-serif;
+    font-family: "Euclid Circular B", Roboto, Helvetica, Arial, sans-serif;
     /* overflow: hidden; */
 }
 html, body, div, span, applet, object, iframe,
@@ -25,7 +27,7 @@ time, mark, audio, video {
 	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
-    font-family: PingFang SC, Avenir, Helvetica, Arial, sans-serif;
+    font-family: "Euclid Circular B", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* make sure to set some focus styles for accessibility */
