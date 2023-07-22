@@ -23,8 +23,8 @@ const progress = ref(100)
 const showLoading = ref(false)
 const riskDefaultBorderColor = ref('#ff0620')
 const riskDefaultBgColor = ref('rgba(215, 56, 71, 0.098)')
-const riskNoBorderColor = ref('#0376C9')
-const riskNoBgColor = ref('rgba(3, 118, 201, 0.098)')
+const riskNoBorderColor = ref('#28A745')
+const riskNoBgColor = ref('rgba(40, 167, 69, 0.098)')
 
 const extensions = [solidity, vscodeDark]
 const url = window.location.href
@@ -123,7 +123,7 @@ onBeforeMount(() => {
       }
     })
   } else {
-    showFailToast('缺少必要参数')
+    showFailToast('missing required parameters')
   }
 })
 
