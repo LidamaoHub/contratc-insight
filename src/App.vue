@@ -282,7 +282,7 @@ watch(() => progress.value, (val) => {
     </div>
     <van-dialog v-model:show="show" title="" show-cancel-button width="5.6rem" :showCancelButton="false">
       <div v-if="dialogContent" v-html="formatReport(dialogContent)" class="report-dialog"></div>
-      <div v-else class="dialog-not"><span v-if="contractAddress && chainId" class="loader"></span><p>Please wait a moment, the whole process may take around 20 seconds</p> </div>
+      <div v-else class="dialog-not"><span v-if="contractAddress && chainId" class="loader"></span><p>Please wait a moment, the whole process may take around 20 seconds</p> <p style="margin-top:20px;color:#35393F">AI audit based on GPT-4</p> </div>
     </van-dialog>
     <!-- <van-dialog v-model:show="show" title="" show-cancel-button width="80vw" :showCancelButton="false">
       <div v-if="dialogContent" v-html="formatReport(dialogContent)" class="report-dialog"></div>
