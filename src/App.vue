@@ -73,11 +73,11 @@ const getRiskListFun = () => {
     contractInfo.value.deploy = deploy.timestamp
     contractInfo.value.update = update.timestamp
     if (deploy?.risk === true) {
-      contractInfo.value.riskList.deploy = {risk: true, text: 'deploy', timestamp: deploy.timestamp}
+      contractInfo.value.riskList.deploy = {risk: true, text: 'recently deployed', timestamp: deploy.timestamp}
       progress.value -= 20
     }
     if (update?.risk === true) {
-      contractInfo.value.riskList.update = {risk: true, text: 'update', timestamp: update.timestamp}
+      contractInfo.value.riskList.update = {risk: true, text: 'recently updated', timestamp: update.timestamp}
       progress.value -= 20
     }
   })
