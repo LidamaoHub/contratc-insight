@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from "vue"
+import { ref, onBeforeMount, watch } from "vue"
 import { CopyOutline, AlertCircleSharp, HelpCircleSharp } from "@vicons/ionicons5"
 import { Icon } from "@vicons/utils"
 import { Codemirror } from 'vue-codemirror'
@@ -20,9 +20,13 @@ const show = ref(false)
 const dialogContent = ref('')
 const gradientColor = ref('#04c086')
 const progress = ref(100)
+const showLoading = ref(false)
+const riskDefaultBorderColor = ref('#ff0620')
+const riskDefaultBgColor = ref('rgba(215, 56, 71, 0.098)')
+const riskNoBorderColor = ref('#0376C9')
+const riskNoBgColor = ref('rgba(3, 118, 201, 0.098)')
 
 const extensions = [solidity, vscodeDark]
-// const token = getQueryVariable("token")
 const url = window.location.href
 const token = url.split("/mm")[1]
 const getData = async () => {
@@ -33,14 +37,16 @@ const getData = async () => {
   contractInfo.value = await getContractInfo(contractInfo.value)
   if (!contractInfo.value.isProxy) {
     progress.value -= 20
-    contractInfo.value.riskList.upgradeable = {type: false}
+    contractInfo.value.riskList.upgradeable = {type: false, text: 'upgradeable contract'}
+    showLoading.value = false
   } else {
+    showLoading.value = true
     getRiskListFun()
   }
   contractInfo.value = await getSourceCode(contractInfo.value)
   if (!contractInfo.value.isOpenSources) {
     progress.value -= 20
-    contractInfo.value.riskList.openSourceType = {type: false}
+    contractInfo.value.riskList.openSourceType = {type: false, text: 'openSourceType'}
   }
   console.log(contractInfo.value)
 }
@@ -69,46 +75,24 @@ const getRiskListFun = () => {
     let tx = res[1].tx
     contractInfo.value.deploy = deploy.timestamp
     contractInfo.value.update = update.timestamp
-    if (deploy.risk === true) {
+    if (deploy?.risk === true) {
       contractInfo.value.riskList.deploy = {risk: true, text: 'deploy', timestamp: deploy.timestamp}
       progress.value -= 20
     }
-    if (update.risk === true) {
+    if (update?.risk === true) {
       contractInfo.value.riskList.update = {risk: true, text: 'update', timestamp: update.timestamp}
       progress.value -= 20
     }
-    if (address.risk === true) {
+    if (address?.risk === true) {
       contractInfo.value.riskList.address = {risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`}
       progress.value -= 20
     }
-    if (tx.risk === true) {
+    if (tx?.risk === true) {
       contractInfo.value.riskList.tx = {risk: true, text: 'less transaction', amount: tx.amount, desc: `only ${tx.amount} transaction`}
       progress.value -= 20
     }
+    showLoading.value = false
   })
-  // getRiskList({contract_address: contractAddress.value, chain_id: chainId.value}).then(res => {
-  //   console.log(res)
-  //   if (res.code == 0) {
-  //     contractInfo.value.reportUser = res.report_user
-  //     let risk_list = res.risk_list
-  //     if (risk_list.openSourceType.type === false) {
-  //       contractInfo.value.riskList.openSourceType = {type: false}
-  //       progress.value -= 20
-  //     }
-  //     if (risk_list.updateAlert.type === false) {
-  //       contractInfo.value.riskList.updateAlert = {type: false, desc: risk_list.updateAlert.last_update}
-  //       progress.value -= 20
-  //     }
-  //     if (risk_list.upgradeable.type === false) {
-  //       contractInfo.value.riskList.upgradeable = {type: false}
-  //       progress.value -= 20
-  //     }
-  //     if (risk_list.usersAlert.type === false) {
-  //       contractInfo.value.riskList.upgradeable = {type: false, desc: risk_list.usersAlert.user_count}
-  //       progress.value -= 20
-  //     }
-  //   }
-  // })
 }
 
 const formatReport = (code) => {
@@ -130,6 +114,7 @@ const showDialogFun = () => {
 onBeforeMount(() => {
   console.log('before')
   if (token) {
+    showLoading.value = true
     getShortUrl({token}).then(res => {
       if (res.code == 0) {
         contractAddress.value = res.contract_address
@@ -139,6 +124,16 @@ onBeforeMount(() => {
     })
   } else {
     showFailToast('缺少必要参数')
+  }
+})
+
+watch(() => progress.value, (val) => {
+  if (val >= 70) {
+    gradientColor.value = '#07C160'
+  } else if (val >= 40) {
+    gradientColor.value = '#ff9000'
+  } else {
+    gradientColor.value = '#FF0620'
   }
 })
 </script>
@@ -158,22 +153,25 @@ onBeforeMount(() => {
               v-model:current-rate="currentRate"
               :rate="progress"
               :speed="50"
-              :text="progress + '%'"
               :stroke-width="60"
               size="1.5rem"
               :color="gradientColor"
               layer-color="rgb(255, 244, 244)"
-            />
+            >
+              <template #default>
+                <div class="circle-text" :style="{color: gradientColor}">{{ progress + '%' }}</div>
+              </template>
+            </van-circle>
           </div>
           <p>safety score</p>
           <Icon size=".36rem" @click="showDialogFun" >
             <HelpCircleSharp />
           </Icon>
         </div>
-        <div v-if="contractInfo.isGetSources">
-          <div v-if="Object.keys(contractInfo.riskList).length" class="risk">
+        <div>
+          <div class="risk" :style="{'border-color': contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)  ? riskNoBorderColor  : riskDefaultBorderColor, background: contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)  ? riskNoBgColor  : riskDefaultBgColor}">
             <div class="risk-hd">Contract Risk</div>
-            <div class="risk-list">
+            <div class="risk-list" v-if="contractInfo.riskList && Object.keys(contractInfo.riskList).length">
               <div class="risk-item" v-for="(val, key, index) in contractInfo.riskList" :key="index">
                 <div>
                   <div class="risk-item-title">{{ val.text }}</div>
@@ -185,14 +183,22 @@ onBeforeMount(() => {
                 </Icon>
               </div>
             </div>
+            <div v-if="contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)" class="no-risk">
+              <p>no risk funded</p> 
+            </div>
+            <div v-if="showLoading || !contractInfo.isGetSources" class="loading" style="min-height: 2.4rem">
+              <span v-if="contractAddress && chainId" class="loader"></span>
+            </div>
           </div>
           <div class="user">
-            <div class="user-hd">Contract Risk</div>
-            <div class="user-content">0 users reported the contractas deceptive</div>
+            <div class="user-hd">Contract Controversial</div>
+            <div class="user-content">
+              <p v-if="true">0 users reported the contractas deceptive</p> 
+              <div v-else class="loading" style="min-height: 1rem">
+                <span class="loader"></span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div v-else class="loading">
-          <span v-if="contractAddress && chainId" class="loader"></span>
         </div>
       </div>
     </div>
