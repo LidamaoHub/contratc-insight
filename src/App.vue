@@ -67,12 +67,9 @@ const getReportFun = (index) => {
 }
 
 const getRiskListFun = () => {
-  Promise.all([getProxyUpdate({admin_address: contractInfo.value.adminAddress, chain_id: chainId.value}), getTxAmount({contract_address: contractAddress.value, chain_id: chainId.value})]).then(res => {
-    console.log(res)
-    let deploy = res[0].deploy
-    let update = res[0].update
-    let address = res[1].address
-    let tx = res[1].tx
+  getProxyUpdate({admin_address: contractInfo.value.adminAddress, chain_id: chainId.value}).then(res => {
+    let deploy = res.deploy
+    let update = res.update
     contractInfo.value.deploy = deploy.timestamp
     contractInfo.value.update = update.timestamp
     if (deploy?.risk === true) {
@@ -83,6 +80,10 @@ const getRiskListFun = () => {
       contractInfo.value.riskList.update = {risk: true, text: 'update', timestamp: update.timestamp}
       progress.value -= 20
     }
+  })
+  getTxAmount({contract_address: contractAddress.value, chain_id: chainId.value}).then(res => {
+    let address = res.address
+    let tx = res.tx
     if (address?.risk === true) {
       contractInfo.value.riskList.address = {risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`}
       progress.value -= 20
@@ -247,12 +248,12 @@ watch(() => progress.value, (val) => {
         <div class="item">
           <div class="label">Deploy</div>
           <div class="value flex" v-if="contractInfo.deploy">{{ formatDate('YYYY-mm-dd', contractInfo.deploy * 1000) }}</div>
-          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="contractAddress && chainId" /><span v-else>--</span></div>
+          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="showLoading" /><span v-else>--</span></div>
         </div>
         <div class="item">
           <div class="label">Update</div>
           <div class="value flex" v-if="contractInfo.update">{{ formatDate('YYYY-mm-dd', contractInfo.update * 1000) }}</div>
-          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="contractAddress && chainId" /><span v-else>--</span></div>
+          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="showLoading" /><span v-else>--</span></div>
         </div>
       </div>
     </div>
