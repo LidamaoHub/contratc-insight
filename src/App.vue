@@ -18,6 +18,7 @@ const contractAddress = ref('')
 const currentRate = ref(100)
 const show = ref(false)
 const dialogContent = ref('')
+const reportedCount = ref(-1)
 const gradientColor = ref('#04c086')
 const progress = ref(100)
 const showLoading = ref(false)
@@ -107,7 +108,7 @@ const formatReport = (code) => {
 const showDialogFun = () => {
   showDialog({
     message: 'Scores are for reference only and are based on contractual behavior.',
-    width: '5.6rem',
+    width: '280px',
     closeOnClickOverlay: true
   })
 }
@@ -126,6 +127,9 @@ onBeforeMount(() => {
   } else {
     showFailToast('missing required parameters')
   }
+  setTimeout(() => {
+    reportedCount.value = 0
+  }, 2000)
 })
 
 watch(() => progress.value, (val) => {
@@ -155,7 +159,7 @@ watch(() => progress.value, (val) => {
               :rate="progress"
               :speed="50"
               :stroke-width="60"
-              size="1.5rem"
+              size="75px"
               :color="gradientColor"
               layer-color="rgb(255, 244, 244)"
             >
@@ -166,6 +170,7 @@ watch(() => progress.value, (val) => {
           </div>
           <p>Safety Score</p>
           <Icon size=".36rem" @click="showDialogFun" >
+
             <HelpCircleSharp />
           </Icon>
         </div>
@@ -179,7 +184,7 @@ watch(() => progress.value, (val) => {
                   <div class="risk-item-desc">{{ val.desc || '' }}</div>
                 </div>
                 
-                <Icon size=".36rem" class="iconsize-18"  color="#FF0620">
+                <Icon size="18" class="iconsize-18"  color="#FF0620">
                   <AlertCircleSharp />
                 </Icon>
               </div>
@@ -187,15 +192,15 @@ watch(() => progress.value, (val) => {
             <div v-if="contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)" class="no-risk">
               <p>no risk funded</p> 
             </div>
-            <div v-if="showLoading || !contractInfo.isGetSources" class="loading" style="min-height: 2.4rem">
+            <div v-if="showLoading || !contractInfo.isGetSources" class="loading" style="min-height: 120px">
               <span v-if="contractAddress && chainId" class="loader"></span>
             </div>
           </div>
           <div class="user">
             <div class="user-hd">Contract Controversial</div>
             <div class="user-content">
-              <p v-if="true">0 users reported the contractas deceptive</p> 
-              <div v-else class="loading" style="min-height: 1rem">
+              <p v-if="reportedCount >= 0">{{ reportedCount }} users reported the contractas deceptive</p> 
+              <div v-else class="loading" style="min-height: 100px">
                 <span class="loader"></span>
               </div>
             </div>
@@ -270,7 +275,7 @@ watch(() => progress.value, (val) => {
                 v-model="item.content"
                 :disabled="true"
                 :extensions="extensions"
-                style="height: 100%;flex: 1;font-size: .24rem;max-height: 800px;"
+                style="height: 100%;flex: 1;font-size: 12px;max-height: 800px;"
               />
             </van-collapse-item>
           </van-collapse>
@@ -281,7 +286,7 @@ watch(() => progress.value, (val) => {
         </div>
       </div>
     </div>
-    <van-dialog v-model:show="show" title="" show-cancel-button width="5.6rem" :showCancelButton="false">
+    <van-dialog v-model:show="show" title="" show-cancel-button width="280px" :showCancelButton="false">
       <div v-if="dialogContent" v-html="formatReport(dialogContent)" class="report-dialog"></div>
       <div v-else class="dialog-not"><span v-if="contractAddress && chainId" class="loader"></span><p>Please wait a moment, the whole process may take around 20 seconds</p> <p style="margin-top:20px;color:#35393F">AI audit based on GPT-4</p> </div>
     </van-dialog>
