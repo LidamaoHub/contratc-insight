@@ -36,21 +36,28 @@ const getData = async () => {
   getCreatorAddress(contractInfo.value).then(res => {
     contractInfo.value.contractCreator = res.contractCreator
   })
-  contractInfo.value = await getContractInfo(contractInfo.value)
-  if (!contractInfo.value.isProxy) {
-    progress.value -= 20
-    contractInfo.value.riskList.upgradeable = {risk: true, text: 'upgradeable contract', help: ''}
-    showLoading.value = false
-  } else {
-    showLoading.value = true
-    getRiskListFun()
+  try {
+    contractInfo.value = await getContractInfo(contractInfo.value)
+    if (!contractInfo.value.isProxy) {
+      progress.value -= 20
+      contractInfo.value.riskList.upgradeable = {risk: true, text: 'upgradeable contract', help: ''}
+      showLoading.value = false
+    } else {
+      showLoading.value = true
+      getRiskListFun()
+    }
+  } catch (error) {
+    console.log(error)
   }
-  contractInfo.value = await getSourceCode(contractInfo.value)
-  if (!contractInfo.value.isOpenSources) {
-    progress.value -= 20
-    contractInfo.value.riskList.openSourceType = {risk: true, text: 'open source type', help: ''}
+  try {
+    contractInfo.value = await getSourceCode(contractInfo.value)
+    if (!contractInfo.value.isOpenSources) {
+      progress.value -= 20
+      contractInfo.value.riskList.openSourceType = {risk: true, text: 'open source type', help: ''}
+    }
+  } catch (error) {
+    contractInfo.value.isGetSources = true
   }
-  console.log(contractInfo.value)
 }
 
 const getReportFun = (index) => {
@@ -94,6 +101,8 @@ const getRiskListFun = () => {
       contractInfo.value.riskList.tx = {risk: true, text: 'less transaction count', amount: tx.amount, desc: `only ${tx.amount} transaction`, help: 'the number of transactions that have interacted with this contract is too few, please be aware of the risk.'}
       progress.value -= 20
     }
+    showLoading.value = false
+  }).catch(() => {
     showLoading.value = false
   })
 }
