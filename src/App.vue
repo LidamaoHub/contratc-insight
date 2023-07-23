@@ -7,6 +7,7 @@ import { getReport, getTxAmount, getProxyUpdate, getShortUrl } from './http/api'
 import { solidity } from '@replit/codemirror-lang-solidity'
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { showFailToast, showDialog } from 'vant'
+import Popper from "vue3-popper"
 
 import { getContractInfo, formatAddress, getCreatorAddress, getSourceCode, copy, toEtherscanAddress, formatDate } from "./utils/utils"
 
@@ -38,7 +39,7 @@ const getData = async () => {
   contractInfo.value = await getContractInfo(contractInfo.value)
   if (!contractInfo.value.isProxy) {
     progress.value -= 20
-    contractInfo.value.riskList.upgradeable = {type: false, text: 'upgradeable contract'}
+    contractInfo.value.riskList.upgradeable = {risk: true, text: 'upgradeable contract', help: ''}
     showLoading.value = false
   } else {
     showLoading.value = true
@@ -47,7 +48,7 @@ const getData = async () => {
   contractInfo.value = await getSourceCode(contractInfo.value)
   if (!contractInfo.value.isOpenSources) {
     progress.value -= 20
-    contractInfo.value.riskList.openSourceType = {type: false, text: 'openSourceType'}
+    contractInfo.value.riskList.openSourceType = {risk: true, text: 'open source type', help: ''}
   }
   console.log(contractInfo.value)
 }
@@ -74,11 +75,11 @@ const getRiskListFun = () => {
     contractInfo.value.deploy = deploy.timestamp
     contractInfo.value.update = update.timestamp
     if (deploy?.risk === true) {
-      contractInfo.value.riskList.deploy = {risk: true, text: 'recently deployed', timestamp: deploy.timestamp}
+      contractInfo.value.riskList.deploy = {risk: true, text: 'recently deployed', timestamp: deploy.timestamp, help: 'the contract has just been deployed. Please be aware of the risks'}
       progress.value -= 20
     }
     if (update?.risk === true) {
-      contractInfo.value.riskList.update = {risk: true, text: 'recently updated', timestamp: update.timestamp}
+      contractInfo.value.riskList.update = {risk: true, text: 'recently updated', timestamp: update.timestamp, help: 'Smart contracts have recently been upgraded, so please be aware of the risks.'}
       progress.value -= 20
     }
   })
@@ -86,11 +87,11 @@ const getRiskListFun = () => {
     let address = res.address
     let tx = res.tx
     if (address?.risk === true) {
-      contractInfo.value.riskList.address = {risk: true, text: 'less user count', amount: address.amount, desc: `only ${address.amount} address`}
+      contractInfo.value.riskList.address = {risk: true, text: 'less user count', amount: address.amount, desc: `only ${address.amount} address`, help: 'Very few users have interacted with this contract.'}
       progress.value -= 20
     }
     if (tx?.risk === true) {
-      contractInfo.value.riskList.tx = {risk: true, text: 'less transaction count', amount: tx.amount, desc: `only ${tx.amount} transaction`}
+      contractInfo.value.riskList.tx = {risk: true, text: 'less transaction count', amount: tx.amount, desc: `only ${tx.amount} transaction`, help: 'the number of transactions that have interacted with this contract is too few, please be aware of the risk.'}
       progress.value -= 20
     }
     showLoading.value = false
@@ -169,8 +170,7 @@ watch(() => progress.value, (val) => {
             </van-circle>
           </div>
           <p>Safety Score</p>
-          <Icon size=".36rem" @click="showDialogFun" >
-
+          <Icon size="18" @click="showDialogFun" >
             <HelpCircleSharp />
           </Icon>
         </div>
@@ -180,7 +180,21 @@ watch(() => progress.value, (val) => {
             <div class="risk-list" v-if="contractInfo.riskList && Object.keys(contractInfo.riskList).length">
               <div class="risk-item" v-for="(val, key, index) in contractInfo.riskList" :key="index">
                 <div>
-                  <div class="risk-item-title">{{ val.text }}</div>
+                  <div class="risk-item-title flex">{{ val.text }}
+                    <Popper
+                      v-if="val.help"
+                      class="light"
+                      arrow
+                      hover
+                    >
+                    <template #content>
+                      <div style="max-width: 300px;font-weight: 400;line-height: 1.4;">{{ val.help }}</div>
+                    </template>
+                      <Icon size="18" style="margin-left: .25em">
+                        <HelpCircleSharp />
+                      </Icon>
+                    </Popper>
+                  </div>
                   <div class="risk-item-desc">{{ val.desc || '' }}</div>
                 </div>
                 
