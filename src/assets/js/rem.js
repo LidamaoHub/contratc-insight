@@ -4,11 +4,7 @@
     var recalc = function () {
       var clientWidth = docEl.clientWidth
       if (!clientWidth) return
-      if (clientWidth >= 750) {
-        docEl.style.fontSize = '80px'
-      } else {
-        docEl.style.fontSize = 100 * (clientWidth / 750) + 'px'
-      }
+      docEl.style.fontSize = '50px'
     }
     if (!doc.addEventListener) return
     win.addEventListener(resizeEvt, recalc, false)
