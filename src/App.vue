@@ -85,11 +85,11 @@ const getRiskListFun = () => {
     let address = res.address
     let tx = res.tx
     if (address?.risk === true) {
-      contractInfo.value.riskList.address = {risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`}
+      contractInfo.value.riskList.address = {risk: true, text: 'less user count', amount: address.amount, desc: `only ${address.amount} address`}
       progress.value -= 20
     }
     if (tx?.risk === true) {
-      contractInfo.value.riskList.tx = {risk: true, text: 'less transaction', amount: tx.amount, desc: `only ${tx.amount} transaction`}
+      contractInfo.value.riskList.tx = {risk: true, text: 'less transaction count', amount: tx.amount, desc: `only ${tx.amount} transaction`}
       progress.value -= 20
     }
     showLoading.value = false
@@ -142,8 +142,8 @@ watch(() => progress.value, (val) => {
 <template>
   <div class="content">
     <div class="nav flex-center-sb">
-      <div :class="['nav-item', navIndex == 0 ? 'nav-item-active' : '']" @click="navIndex = 0">score</div>
-      <div :class="['nav-item', navIndex == 1 ? 'nav-item-active' : '']" @click="navIndex = 1">info</div>
+      <div :class="['nav-item', navIndex == 0 ? 'nav-item-active' : '']" @click="navIndex = 0">Score</div>
+      <div :class="['nav-item', navIndex == 1 ? 'nav-item-active' : '']" @click="navIndex = 1">Info</div>
       <div :class="['nav-item', navIndex == 2 ? 'nav-item-active' : '']" @click="navIndex = 2">AI audit</div>
     </div>
     <div v-show="navIndex == 0" class="section">
@@ -164,7 +164,7 @@ watch(() => progress.value, (val) => {
               </template>
             </van-circle>
           </div>
-          <p>safety score</p>
+          <p>Safety Score</p>
           <Icon size=".36rem" @click="showDialogFun" >
             <HelpCircleSharp />
           </Icon>
@@ -226,7 +226,7 @@ watch(() => progress.value, (val) => {
           <div v-else class="value flex">--</div>
         </div>
         <div class="item">
-          <div class="label">Proxy Address</div>
+          <div class="label">Proxy Contract Address</div>
           <div v-if="contractInfo.proxyAddress" class="value flex">
             <a :href="toEtherscanAddress(contractInfo.proxyAddress, chainId)" target="_blank">{{formatAddress(contractInfo.proxyAddress, 8)}}</a> 
             <Icon color="#6c757d" class="copy-icon" @click="copy(contractInfo.proxyAddress)">
@@ -236,22 +236,22 @@ watch(() => progress.value, (val) => {
           <div v-else class="value flex">--</div>
         </div>
         <div class="item">
-          <div class="label">Is Proxy</div>
+          <div class="label">Is Proxy Contract</div>
           <div class="value flex" v-if="contractInfo.adminAddress">{{ contractInfo.isProxy ? 'Yes' : 'No' }}</div>
           <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="contractAddress && chainId" /><span v-else>--</span></div>
         </div>
         <div class="item">
-          <div class="label">Is OpenSoure</div>
+          <div class="label">Is OpenSoured</div>
           <div class="value flex" v-if="contractInfo.isGetSources">{{ contractInfo.sources ? 'Yes' : 'No' }}</div>
           <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="contractAddress && chainId" /><span v-else>--</span></div>
         </div>
         <div class="item">
-          <div class="label">Deploy</div>
+          <div class="label">Deploy Time</div>
           <div class="value flex" v-if="contractInfo.deploy">{{ formatDate('YYYY-mm-dd', contractInfo.deploy * 1000) }}</div>
           <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="showLoading" /><span v-else>--</span></div>
         </div>
         <div class="item">
-          <div class="label">Update</div>
+          <div class="label">Update Time</div>
           <div class="value flex" v-if="contractInfo.update">{{ formatDate('YYYY-mm-dd', contractInfo.update * 1000) }}</div>
           <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="showLoading" /><span v-else>--</span></div>
         </div>

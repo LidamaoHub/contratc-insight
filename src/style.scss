@@ -86,8 +86,8 @@
           align-items: flex-start;
           justify-content: space-between;
           .risk-item-title {
-            font-weight: 500;
             font-size: .28rem;
+            font-weight:bold;
           }
           .risk-item-desc {
             font-size: .28rem;
@@ -107,6 +107,7 @@
       box-sizing: border-box;
       background: rgba(3, 118, 201, 0.098);
       .user-hd {
+        font-weight:bold;
         display: flex;
         align-items: center;
         font-size: .28rem;
@@ -129,7 +130,6 @@
       justify-content: space-between;
       height: 1.84rem;
       box-sizing: border-box;
-      border-bottom: 1px solid #d6d9dc;
       color: #2F343D;
       .label {
         font-size: .28rem;
