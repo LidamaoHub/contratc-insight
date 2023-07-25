@@ -317,7 +317,7 @@ watch(() => progress.value, (val) => {
               />
             </van-collapse-item>
           </van-collapse>
-          <div v-else>No source code</div>
+          <div v-else>Not Opensourced</div>
         </div>
         <div class="loading" v-else>
           <span v-if="contractAddress && chainId" class="loader"></span>
