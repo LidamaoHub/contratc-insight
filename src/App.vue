@@ -31,6 +31,24 @@ const riskNoBgColor = ref('rgba(40, 167, 69, 0.098)')
 const extensions = [solidity, vscodeDark]
 const url = window.location.href
 const token = url.split("/mm")[1]
+
+const getReportFun = (index, notShow) => {
+  let code = contractInfo.value.sources[index].content
+  let report = contractInfo.value.sources[index].report
+  if (report) dialogContent.value = report
+  if (code && !report) {
+    getReport({code}).then(res => {
+      console.log(res)
+      let report = res.report
+      contractInfo.value.sources[index].report = report
+      dialogContent.value = report
+    })
+  }
+  if (!notShow) {
+    show.value = true
+  }
+}
+
 const getData = async () => {
   contractInfo.value = {address: contractAddress.value, chainId: chainId.value, riskList: {}}
   getCreatorAddress(contractInfo.value).then(res => {
@@ -54,26 +72,15 @@ const getData = async () => {
     if (!contractInfo.value.isOpenSources) {
       progress.value -= 20
       contractInfo.value.riskList.openSourceType = {risk: true, text: 'open source type', help: ''}
+    } else {
+      console.log(contractInfo.value)
+      getReportFun(0, true)
     }
   } catch (error) {
     contractInfo.value.isGetSources = true
   }
 }
 
-const getReportFun = (index) => {
-  let code = contractInfo.value.sources[index].content
-  let report = contractInfo.value.sources[index].report
-  if (report) dialogContent.value = report
-  if (code && !report) {
-    getReport({code}).then(res => {
-      console.log(res)
-      let report = res.report
-      contractInfo.value.sources[index].report = report
-      dialogContent.value = report
-    })
-  }
-  show.value = true
-}
 
 const getRiskListFun = () => {
   getProxyUpdate({admin_address: contractInfo.value.adminAddress, chain_id: chainId.value}).then(res => {
@@ -223,6 +230,16 @@ watch(() => progress.value, (val) => {
             <div class="user-hd">Contract Controversial</div>
             <div class="user-content">
               <p v-if="reportedCount >= 0">{{ reportedCount }} users reported the contractas deceptive</p> 
+              <div v-else class="loading" style="min-height: 100px">
+                <span class="loader"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="user">
+            <div class="user-hd">AI Contract Audit</div>
+            <div class="user-content">
+              <p v-if="dialogContent" v-html="formatReport(dialogContent)"></p> 
               <div v-else class="loading" style="min-height: 100px">
                 <span class="loader"></span>
               </div>
