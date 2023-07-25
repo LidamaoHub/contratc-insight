@@ -53,7 +53,7 @@ const getData = async () => {
     contractInfo.value = await getSourceCode(contractInfo.value)
     if (!contractInfo.value.isOpenSources) {
       progress.value -= 20
-      contractInfo.value.riskList.openSourceType = {risk: true, text: 'open source type', help: ''}
+      contractInfo.value.riskList.openSourceType = {risk: true, text: 'not opensourced', help: ''}
     }
   } catch (error) {
     contractInfo.value.isGetSources = true
@@ -302,7 +302,7 @@ watch(() => progress.value, (val) => {
               />
             </van-collapse-item>
           </van-collapse>
-          <div v-else>No source code</div>
+          <div v-else>Not Opensourced</div>
         </div>
         <div class="loading" v-else>
           <span v-if="contractAddress && chainId" class="loader"></span>
