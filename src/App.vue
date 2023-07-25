@@ -38,7 +38,6 @@ const getReportFun = (index, notShow) => {
   if (report) dialogContent.value = report
   if (code && !report) {
     getReport({code}).then(res => {
-      console.log(res)
       let report = res.report
       contractInfo.value.sources[index].report = report
       dialogContent.value = report
@@ -56,13 +55,13 @@ const getData = async () => {
   })
   try {
     contractInfo.value = await getContractInfo(contractInfo.value)
-    if (!contractInfo.value.isProxy) {
+    if (contractInfo.value.isProxy) {
       progress.value -= 20
       contractInfo.value.riskList.upgradeable = {risk: true, text: 'upgradeable contract', help: ''}
-      showLoading.value = false
-    } else {
       showLoading.value = true
       getRiskListFun()
+    } else {
+      showLoading.value = false
     }
   } catch (error) {
     console.log(error)
@@ -71,9 +70,8 @@ const getData = async () => {
     contractInfo.value = await getSourceCode(contractInfo.value)
     if (!contractInfo.value.isOpenSources) {
       progress.value -= 20
-      contractInfo.value.riskList.openSourceType = {risk: true, text: 'open source type', help: ''}
+      contractInfo.value.riskList.openSourceType = {risk: true, text: 'not opensourced', help: ''}
     } else {
-      console.log(contractInfo.value)
       getReportFun(0, true)
     }
   } catch (error) {
