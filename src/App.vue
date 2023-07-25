@@ -234,7 +234,7 @@ watch(() => progress.value, (val) => {
             </div>
           </div>
 
-          <div class="user">
+          <div v-if="contractInfo.isOpenSources" class="user">
             <div class="user-hd">AI Contract Audit</div>
             <div class="user-content">
               <p v-if="dialogContent" v-html="formatReport(dialogContent)"></p> 
