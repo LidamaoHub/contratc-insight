@@ -37,7 +37,7 @@ const getReportFun = (index, notShow) => {
   let report = contractInfo.value.sources[index].report
   if (report) dialogContent.value = report
   if (code && !report) {
-    getReport({code}).then(res => {
+    getReport({ code }).then(res => {
       let report = res.report
       contractInfo.value.sources[index].report = report
       dialogContent.value = report
@@ -49,7 +49,7 @@ const getReportFun = (index, notShow) => {
 }
 
 const getData = async () => {
-  contractInfo.value = {address: contractAddress.value, chainId: chainId.value, riskList: {}}
+  contractInfo.value = { address: contractAddress.value, chainId: chainId.value, riskList: {} }
   getCreatorAddress(contractInfo.value).then(res => {
     contractInfo.value.contractCreator = res.contractCreator
   })
@@ -57,7 +57,7 @@ const getData = async () => {
     contractInfo.value = await getContractInfo(contractInfo.value)
     if (contractInfo.value.isProxy) {
       progress.value -= 20
-      contractInfo.value.riskList.upgradeable = {risk: true, text: 'upgradeable contract', help: ''}
+      contractInfo.value.riskList.upgradeable = { risk: true, text: 'upgradeable contract', help: '' }
       showLoading.value = true
       getRiskListFun()
     } else {
@@ -70,7 +70,7 @@ const getData = async () => {
     contractInfo.value = await getSourceCode(contractInfo.value)
     if (!contractInfo.value.isOpenSources) {
       progress.value -= 20
-      contractInfo.value.riskList.openSourceType = {risk: true, text: 'not opensourced', help: ''}
+      contractInfo.value.riskList.openSourceType = { risk: true, text: 'not opensourced', help: '' }
     } else {
       getReportFun(0, true)
     }
@@ -81,29 +81,29 @@ const getData = async () => {
 
 
 const getRiskListFun = () => {
-  getProxyUpdate({admin_address: contractInfo.value.adminAddress, chain_id: chainId.value}).then(res => {
+  getProxyUpdate({ admin_address: contractInfo.value.adminAddress, chain_id: chainId.value }).then(res => {
     let deploy = res.deploy
     let update = res.update
     contractInfo.value.deploy = deploy.timestamp
     contractInfo.value.update = update.timestamp
     if (deploy?.risk === true) {
-      contractInfo.value.riskList.deploy = {risk: true, text: 'recently deployed', timestamp: deploy.timestamp, help: 'the contract has just been deployed. Please be aware of the risks'}
+      contractInfo.value.riskList.deploy = { risk: true, text: 'recently deployed', timestamp: deploy.timestamp, help: 'the contract has just been deployed. Please be aware of the risks' }
       progress.value -= 20
     }
     if (update?.risk === true) {
-      contractInfo.value.riskList.update = {risk: true, text: 'recently updated', timestamp: update.timestamp, help: 'Smart contracts have recently been upgraded, so please be aware of the risks.'}
+      contractInfo.value.riskList.update = { risk: true, text: 'recently updated', timestamp: update.timestamp, help: 'Smart contracts have recently been upgraded, so please be aware of the risks.' }
       progress.value -= 20
     }
   })
-  getTxAmount({contract_address: contractAddress.value, chain_id: chainId.value}).then(res => {
+  getTxAmount({ contract_address: contractAddress.value, chain_id: chainId.value }).then(res => {
     let address = res.address
     let tx = res.tx
     if (address?.risk === true) {
-      contractInfo.value.riskList.address = {risk: true, text: 'less user count', amount: address.amount, desc: `only ${address.amount} address`, help: 'Very few users have interacted with this contract.'}
+      contractInfo.value.riskList.address = { risk: true, text: 'less user count', amount: address.amount, desc: `only ${address.amount} address`, help: 'Very few users have interacted with this contract.' }
       progress.value -= 20
     }
     if (tx?.risk === true) {
-      contractInfo.value.riskList.tx = {risk: true, text: 'less transaction count', amount: tx.amount, desc: `only ${tx.amount} transaction`, help: 'the number of transactions that have interacted with this contract is too few, please be aware of the risk.'}
+      contractInfo.value.riskList.tx = { risk: true, text: 'less transaction count', amount: tx.amount, desc: `only ${tx.amount} transaction`, help: 'the number of transactions that have interacted with this contract is too few, please be aware of the risk.' }
       progress.value -= 20
     }
     showLoading.value = false
@@ -132,7 +132,7 @@ onBeforeMount(() => {
   console.log('before')
   if (token) {
     showLoading.value = true
-    getShortUrl({token}).then(res => {
+    getShortUrl({ token }).then(res => {
       if (res.code == 0) {
         contractAddress.value = res.contract_address
         chainId.value = res.chain_id
@@ -169,41 +169,30 @@ watch(() => progress.value, (val) => {
       <div class="score">
         <div class="score-hd flex">
           <div class="chart">
-            <van-circle
-              v-model:current-rate="currentRate"
-              :rate="progress"
-              :speed="50"
-              :stroke-width="60"
-              size="75px"
-              :color="gradientColor"
-              layer-color="rgb(255, 244, 244)"
-            >
+            <van-circle v-model:current-rate="currentRate" :rate="progress" :speed="50" :stroke-width="60" size="75px"
+              :color="gradientColor" layer-color="rgb(255, 244, 244)">
               <template #default>
-                <div class="circle-text" :style="{color: gradientColor}">{{ progress + '%' }}</div>
+                <div class="circle-text" :style="{ color: gradientColor }">{{ progress + '%' }}</div>
               </template>
             </van-circle>
           </div>
           <p>Safety Score</p>
-          <Icon size="18" @click="showDialogFun" >
+          <Icon size="18" @click="showDialogFun">
             <HelpCircleSharp />
           </Icon>
         </div>
         <div>
-          <div class="risk" :style="{'border-color': contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)  ? riskNoBorderColor  : riskDefaultBorderColor, background: contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)  ? riskNoBgColor  : riskDefaultBgColor}">
+          <div class="risk"
+            :style="{ 'border-color': contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length) ? riskNoBorderColor : riskDefaultBorderColor, background: contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length) ? riskNoBgColor : riskDefaultBgColor }">
             <div class="risk-hd">Contract Risk</div>
             <div class="risk-list" v-if="contractInfo.riskList && Object.keys(contractInfo.riskList).length">
               <div class="risk-item" v-for="(val, key, index) in contractInfo.riskList" :key="index">
                 <div>
                   <div class="risk-item-title flex">{{ val.text }}
-                    <Popper
-                      v-if="val.help"
-                      class="light"
-                      arrow
-                      hover
-                    >
-                    <template #content>
-                      <div style="max-width: 300px;font-weight: 400;line-height: 1.4;">{{ val.help }}</div>
-                    </template>
+                    <Popper v-if="val.help" class="light" arrow hover>
+                      <template #content>
+                        <div style="max-width: 300px;font-weight: 400;line-height: 1.4;">{{ val.help }}</div>
+                      </template>
                       <Icon size="18" style="margin-left: .25em">
                         <HelpCircleSharp />
                       </Icon>
@@ -211,14 +200,16 @@ watch(() => progress.value, (val) => {
                   </div>
                   <div class="risk-item-desc">{{ val.desc || '' }}</div>
                 </div>
-                
-                <Icon size="18" class="iconsize-18"  color="#FF0620">
+
+                <Icon size="18" class="iconsize-18" color="#FF0620">
                   <AlertCircleSharp />
                 </Icon>
               </div>
             </div>
-            <div v-if="contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)" class="no-risk">
-              <p>no risk funded</p> 
+            <div
+              v-if="contractInfo.isGetSources && !showLoading && !(contractInfo.riskList && Object.keys(contractInfo.riskList).length)"
+              class="no-risk">
+              <p>no risk funded</p>
             </div>
             <div v-if="showLoading || !contractInfo.isGetSources" class="loading" style="min-height: 120px">
               <span v-if="contractAddress && chainId" class="loader"></span>
@@ -227,7 +218,7 @@ watch(() => progress.value, (val) => {
           <div class="user">
             <div class="user-hd">Contract Controversial</div>
             <div class="user-content">
-              <p v-if="reportedCount >= 0">{{ reportedCount }} users reported the contractas deceptive</p> 
+              <p v-if="reportedCount >= 0">{{ reportedCount }} users reported the contractas deceptive</p>
               <div v-else class="loading" style="min-height: 100px">
                 <span class="loader"></span>
               </div>
@@ -237,7 +228,7 @@ watch(() => progress.value, (val) => {
           <div v-if="contractInfo.isOpenSources" class="user">
             <div class="user-hd">AI Contract Audit</div>
             <div class="user-content">
-              <p v-if="dialogContent" v-html="formatReport(dialogContent)"></p> 
+              <p v-if="dialogContent" v-html="formatReport(dialogContent)"></p>
               <div v-else class="loading" style="min-height: 100px">
                 <span class="loader"></span>
               </div>
@@ -251,7 +242,8 @@ watch(() => progress.value, (val) => {
         <div class="item">
           <div class="label">Contract Address</div>
           <div v-if="contractInfo.address" class="value flex">
-            <a :href="toEtherscanAddress(contractInfo.address, chainId)" target="_blank">{{formatAddress(contractInfo.address, 8)}}</a> 
+            <a :href="toEtherscanAddress(contractInfo.address, chainId)"
+              target="_blank">{{ formatAddress(contractInfo.address, 8) }}</a>
             <Icon color="#6c757d" class="copy-icon" @click="copy(contractInfo.address)">
               <CopyOutline />
             </Icon>
@@ -261,7 +253,8 @@ watch(() => progress.value, (val) => {
         <div class="item">
           <div class="label">Creator Address</div>
           <div v-if="contractInfo.contractCreator" class="value flex">
-            <a :href="toEtherscanAddress(contractInfo.contractCreator, chainId)" target="_blank">{{formatAddress(contractInfo.contractCreator, 8)}}</a> 
+            <a :href="toEtherscanAddress(contractInfo.contractCreator, chainId)"
+              target="_blank">{{ formatAddress(contractInfo.contractCreator, 8) }}</a>
             <Icon color="#6c757d" class="copy-icon" @click="copy(contractInfo.contractCreator)">
               <CopyOutline />
             </Icon>
@@ -271,7 +264,8 @@ watch(() => progress.value, (val) => {
         <div class="item">
           <div class="label">Proxy Contract Address</div>
           <div v-if="contractInfo.proxyAddress" class="value flex">
-            <a :href="toEtherscanAddress(contractInfo.proxyAddress, chainId)" target="_blank">{{formatAddress(contractInfo.proxyAddress, 8)}}</a> 
+            <a :href="toEtherscanAddress(contractInfo.proxyAddress, chainId)"
+              target="_blank">{{ formatAddress(contractInfo.proxyAddress, 8) }}</a>
             <Icon color="#6c757d" class="copy-icon" @click="copy(contractInfo.proxyAddress)">
               <CopyOutline />
             </Icon>
@@ -281,22 +275,28 @@ watch(() => progress.value, (val) => {
         <div class="item">
           <div class="label">Is Proxy Contract</div>
           <div class="value flex" v-if="contractInfo.adminAddress">{{ contractInfo.isProxy ? 'Yes' : 'No' }}</div>
-          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="contractAddress && chainId" /><span v-else>--</span></div>
+          <div class="value flex" v-else><van-loading color="#6c757d" size="18" v-if="contractAddress && chainId" /><span
+              v-else>--</span></div>
         </div>
         <div class="item">
           <div class="label">Is OpenSoured</div>
           <div class="value flex" v-if="contractInfo.isGetSources">{{ contractInfo.sources ? 'Yes' : 'No' }}</div>
-          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="contractAddress && chainId" /><span v-else>--</span></div>
+          <div class="value flex" v-else><van-loading color="#6c757d" size="18" v-if="contractAddress && chainId" /><span
+              v-else>--</span></div>
         </div>
         <div class="item">
           <div class="label">Deploy Time</div>
-          <div class="value flex" v-if="contractInfo.deploy">{{ formatDate('YYYY-mm-dd', contractInfo.deploy * 1000) }}</div>
-          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="showLoading" /><span v-else>--</span></div>
+          <div class="value flex" v-if="contractInfo.deploy">{{ formatDate('YYYY-mm-dd', contractInfo.deploy * 1000) }}
+          </div>
+          <div class="value flex" v-else><van-loading color="#6c757d" size="18" v-if="showLoading" /><span
+              v-else>--</span></div>
         </div>
         <div class="item">
           <div class="label">Update Time</div>
-          <div class="value flex" v-if="contractInfo.update">{{ formatDate('YYYY-mm-dd', contractInfo.update * 1000) }}</div>
-          <div class="value flex" v-else><van-loading  color="#6c757d" size="18" v-if="showLoading" /><span v-else>--</span></div>
+          <div class="value flex" v-if="contractInfo.update">{{ formatDate('YYYY-mm-dd', contractInfo.update * 1000) }}
+          </div>
+          <div class="value flex" v-else><van-loading color="#6c757d" size="18" v-if="showLoading" /><span
+              v-else>--</span></div>
         </div>
       </div>
     </div>
@@ -305,16 +305,13 @@ watch(() => progress.value, (val) => {
         <div class="sources-title">Source Code</div>
         <div v-if="contractInfo.isGetSources" class="main">
           <van-collapse v-if="contractInfo.sources && contractInfo.sources.length" v-model="activeNames">
-            <van-collapse-item v-for="(item, index) in contractInfo.sources" :key="index" :title="item.name" :name="index">
+            <van-collapse-item v-for="(item, index) in contractInfo.sources" :key="index" :title="item.name"
+              :name="index">
               <template #value>
                 <div class="collapse-btn" @click.stop="getReportFun(index)">Audit</div>
               </template>
-              <Codemirror
-                v-model="item.content"
-                :disabled="true"
-                :extensions="extensions"
-                style="height: 100%;flex: 1;font-size: 12px;max-height: 800px;"
-              />
+              <Codemirror v-model="item.content" :disabled="true" :extensions="extensions"
+                style="height: 100%;flex: 1;font-size: 12px;max-height: 800px;" />
             </van-collapse-item>
           </van-collapse>
           <div v-else>Not Opensourced</div>
@@ -326,7 +323,10 @@ watch(() => progress.value, (val) => {
     </div>
     <van-dialog v-model:show="show" title="" show-cancel-button width="280px" :showCancelButton="false">
       <div v-if="dialogContent" v-html="formatReport(dialogContent)" class="report-dialog"></div>
-      <div v-else class="dialog-not"><span v-if="contractAddress && chainId" class="loader"></span><p>Please wait a moment, the whole process may take around 20 seconds</p> <p style="margin-top:20px;color:#35393F">AI audit based on GPT-4</p> </div>
+      <div v-else class="dialog-not"><span v-if="contractAddress && chainId" class="loader"></span>
+        <p>Please wait a moment, the whole process may take around 20 seconds</p>
+        <p style="margin-top:20px;color:#35393F">AI audit based on GPT-4</p>
+      </div>
     </van-dialog>
     <!-- <van-dialog v-model:show="show" title="" show-cancel-button width="80vw" :showCancelButton="false">
       <div v-if="dialogContent" v-html="formatReport(dialogContent)" class="report-dialog"></div>
